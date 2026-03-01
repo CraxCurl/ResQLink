@@ -1,11 +1,11 @@
 let holdTimer;
 
 function openSettings() {
-    document.getElementById("settingsModal").style.display = "block";
+    document.getElementById("sheet").classList.add("active");
 }
 
 function closeSettings() {
-    document.getElementById("settingsModal").style.display = "none";
+    document.getElementById("sheet").classList.remove("active");
 }
 
 function saveNumber() {
@@ -13,7 +13,6 @@ function saveNumber() {
     localStorage.setItem("emergencyNumber", number);
     document.getElementById("phoneInput").value = "";
     closeSettings();
-    alert("Number saved securely.");
 }
 
 function holdStart() {
@@ -38,12 +37,12 @@ function triggerSOS() {
         const lon = position.coords.longitude;
 
         const link = `https://maps.google.com/?q=${lat},${lon}`;
-        const msg = `🚨 SOS! I need help. My location: ${link}`;
+        const msg = `🚨 SOS! I need help. Location: ${link}`;
 
         document.getElementById("statusText").innerText = "SOS Sent";
-        document.getElementById("statusDot").style.background = "#ef4444";
+        document.querySelector(".dot").style.background = "#ef4444";
 
-        if (navigator.vibrate) navigator.vibrate([300,100,300]);
+        if (navigator.vibrate) navigator.vibrate([400,200,400]);
 
         window.location.href =
             `sms:${number}?body=${encodeURIComponent(msg)}`;
