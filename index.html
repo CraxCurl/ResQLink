@@ -10,32 +10,36 @@
 
 <body>
 
+<div class="bg"></div>
+
 <div class="app">
 
-    <div class="top-bar">
-        <span id="statusDot"></span>
-        <span id="statusText">Ready</span>
-        <button class="settings-btn" onclick="openSettings()">⚙</button>
+    <div class="header">
+        <div class="status">
+            <span class="dot"></span>
+            <span id="statusText">Protected</span>
+        </div>
+        <button class="gear" onclick="openSettings()">⚙</button>
     </div>
 
-    <div class="center">
-        <button class="sos-btn"
-                ontouchstart="holdStart()"
+    <div class="main">
+        <button class="sos" 
+                ontouchstart="holdStart()" 
                 ontouchend="holdEnd()">
-            HOLD FOR SOS
+            <span>SOS</span>
         </button>
-        <p class="hint">Hold for 2 seconds</p>
+        <p class="sub">Hold for 2 seconds</p>
     </div>
 
 </div>
 
-<!-- Settings Modal -->
-<div class="modal" id="settingsModal">
-    <div class="modal-content">
+<!-- Settings Bottom Sheet -->
+<div class="sheet" id="sheet">
+    <div class="sheet-content">
         <h3>Emergency Contact</h3>
-        <input type="tel" id="phoneInput" placeholder="Enter number">
-        <button onclick="saveNumber()">Save</button>
-        <button class="close" onclick="closeSettings()">Close</button>
+        <input type="tel" id="phoneInput" placeholder="Enter phone number">
+        <button class="save" onclick="saveNumber()">Save</button>
+        <button class="cancel" onclick="closeSettings()">Cancel</button>
     </div>
 </div>
 
