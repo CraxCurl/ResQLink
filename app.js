@@ -1,89 +1,90 @@
-let bluetoothConnected = false;
-let locationReady = false;
-let holdInterval = null;
-let holdProgress = 0;
-let locationData = null;
+let device;
+let characteristic;
 
-const btDot = document.getElementById("btDot");
-const gpsDot = document.getElementById("gpsDot");
-const systemPanel = document.getElementById("systemPanel");
-const holdBtn = document.getElementById("holdBtn");
-const progressBar = document.getElementById("progressBar");
-const lastAlert = document.getElementById("lastAlert");
-const deliveryStatus = document.getElementById("deliveryStatus");
+function register() {
+  const user = {
+    name: fullName.value,
+    email: email.value,
+    password: password.value,
+    guardian: guardianPhone.value
+  };
 
-/* ---- Simulated Bluetooth Connection ---- */
-setTimeout(() => {
-  bluetoothConnected = true;
-  btDot.classList.remove("red");
-  btDot.classList.add("green");
-}, 1500);
-
-/* ---- GPS ---- */
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition((pos) => {
-    locationReady = true;
-    locationData = pos.coords;
-    gpsDot.classList.remove("red");
-    gpsDot.classList.add("green");
-  });
+  localStorage.setItem("user", JSON.stringify(user));
+  alert("Registered Successfully");
 }
 
-/* ---- HOLD LOGIC ---- */
-holdBtn.addEventListener("mousedown", startHold);
-holdBtn.addEventListener("mouseup", cancelHold);
-holdBtn.addEventListener("mouseleave", cancelHold);
+function login() {
+  const stored = JSON.parse(localStorage.getItem("user"));
+  if (!stored) return alert("Register first");
 
-holdBtn.addEventListener("touchstart", startHold);
-holdBtn.addEventListener("touchend", cancelHold);
-
-function startHold() {
-  holdProgress = 0;
-
-  holdInterval = setInterval(() => {
-    holdProgress += 2;
-    progressBar.style.width = holdProgress + "%";
-
-    if (holdProgress >= 100) {
-      clearInterval(holdInterval);
-      triggerSOS();
-    }
-  }, 60); // 3 seconds
+  if (stored.email === email.value && stored.password === password.value) {
+    showDashboard();
+  } else {
+    alert("Invalid Credentials");
+  }
 }
 
-function cancelHold() {
-  clearInterval(holdInterval);
-  holdProgress = 0;
-  progressBar.style.width = "0%";
+function showDashboard() {
+  authScreen.classList.remove("active");
+  dashboard.classList.add("active");
 }
 
-/* ---- SOS ---- */
-function triggerSOS() {
+function openProfile() {
+  dashboard.classList.remove("active");
+  profileScreen.classList.add("active");
 
-  systemPanel.classList.remove("armed");
-  systemPanel.classList.add("alert");
-  systemPanel.innerText = "SOS TRIGGERED – SENDING ALERT";
+  const user = JSON.parse(localStorage.getItem("user"));
+  profileName.innerText = user.name;
+  profileEmail.innerText = user.email;
+}
 
-  const now = new Date().toLocaleString();
-  lastAlert.innerText = now;
-  deliveryStatus.innerText = "Sending...";
+function goDashboard() {
+  profileScreen.classList.remove("active");
+  dashboard.classList.add("active");
+}
 
-  if (!locationData) {
-    deliveryStatus.innerText = "Location unavailable";
-    return;
+function updateGuardian() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (confirmPassword.value !== user.password) {
+    return alert("Incorrect Password");
   }
 
-  const mapLink = `https://maps.google.com/?q=${locationData.latitude},${locationData.longitude}`;
-  const message = `🚨 SOS ALERT\nLocation: ${mapLink}`;
+  user.guardian = newGuardian.value;
+  localStorage.setItem("user", JSON.stringify(user));
+  alert("Guardian Updated");
+}
 
-  const emergencyNumber = localStorage.getItem("guardianNumber") || "";
+async function connectESP32() {
+  try {
+    device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['battery_service']
+    });
 
-  if (emergencyNumber) {
-    window.location.href =
-      `sms:${emergencyNumber}?body=${encodeURIComponent(message)}`;
+    const server = await device.gatt.connect();
+    document.getElementById("connectionLight").classList.add("connected");
+    document.getElementById("connectionText").innerText = "Stick Connected";
+
+    device.addEventListener('gattserverdisconnected', () => {
+      document.getElementById("connectionLight").classList.remove("connected");
+      document.getElementById("connectionText").innerText = "Stick Not Connected";
+    });
+
+    listenForSOS();
+
+  } catch (error) {
+    alert("Connection Failed");
   }
+}
 
-  setTimeout(() => {
-    deliveryStatus.innerText = "Alert sent successfully";
-  }, 2000);
+function listenForSOS() {
+  // Replace with your real ESP32 characteristic UUID
+  console.log("Listening for SOS...");
+}
+
+function sendSOS() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const message = "🚨 SOS ALERT! Please help immediately.";
+  window.location.href =
+    `sms:${user.guardian}?body=${encodeURIComponent(message)}`;
 }
