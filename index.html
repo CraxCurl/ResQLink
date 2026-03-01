@@ -3,44 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guardian SOS</title>
+<title>SignalShield</title>
 <link rel="stylesheet" href="style.css">
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
-
+<link rel="manifest" href="manifest.json">
 </head>
+
 <body>
 
-<div class="background-pulse"></div>
+<div class="app">
 
-<div class="app-card">
-
-    <h1>🚨 Guardian SOS</h1>
-
-    <div class="input-group">
-        <input type="tel" id="phoneNumber" placeholder="Enter Emergency Number">
-        <button onclick="saveNumber()">Save</button>
+    <div class="top-bar">
+        <span id="statusDot"></span>
+        <span id="statusText">Ready</span>
+        <button class="settings-btn" onclick="openSettings()">⚙</button>
     </div>
 
-    <div class="map-container">
-        <iframe id="mapFrame"></iframe>
-    </div>
-
-    <button class="sos-button" onclick="triggerSOS()">
-        HOLD TO SEND SOS
-    </button>
-
-    <div class="status">
-        <span id="connectionStatus">🟢 Connected</span>
-        <span id="sosStatus">Safe</span>
+    <div class="center">
+        <button class="sos-btn"
+                ontouchstart="holdStart()"
+                ontouchend="holdEnd()">
+            HOLD FOR SOS
+        </button>
+        <p class="hint">Hold for 2 seconds</p>
     </div>
 
 </div>
 
-<script type="module" src="firebase-config.js"></script>
-<script src="script.js"></script>
+<!-- Settings Modal -->
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <h3>Emergency Contact</h3>
+        <input type="tel" id="phoneInput" placeholder="Enter number">
+        <button onclick="saveNumber()">Save</button>
+        <button class="close" onclick="closeSettings()">Close</button>
+    </div>
+</div>
 
+<script src="script.js"></script>
 </body>
 </html>
