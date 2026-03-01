@@ -1,43 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ResQLink</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResQLink</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<!-- LOADING SCREEN -->
+<!-- LOADING -->
 <div id="loadingScreen" class="screen active">
   <div class="logo">ResQLink</div>
-  <div class="quote" id="quoteText">Empowering Every Step.</div>
+  <div class="quote">Empowering Every Step.</div>
   <div class="loader"></div>
 </div>
 
-<!-- AUTH SCREEN -->
-<div id="authScreen" class="screen">
+<!-- LOGIN -->
+<div id="loginScreen" class="screen">
   <h1 class="brand">ResQLink</h1>
 
-  <div class="features">
-    <div class="feature">🛡 <strong>Real-Time Safety</strong><br><small>Instant protection when needed.</small></div>
-    <div class="feature">📍 <strong>Location Tracking</strong><br><small>Accurate live positioning.</small></div>
-    <div class="feature">🚨 <strong>Emergency SOS</strong><br><small>Immediate guardian alert.</small></div>
-    <div class="feature">👥 <strong>Guardian Connect</strong><br><small>Stay linked to trusted contacts.</small></div>
+  <div class="feature-wrapper">
+    <div class="feature-grid">
+      <div class="feature-box">🛡<br><small>Safety</small></div>
+      <div class="feature-box">📍<br><small>Tracking</small></div>
+      <div class="feature-box">🚨<br><small>SOS</small></div>
+      <div class="feature-box">👥<br><small>Guardian</small></div>
+    </div>
   </div>
 
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <input type="tel" id="guardian" placeholder="Guardian Phone (+91...)">
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Password">
+
+  <button id="loginBtn">Login</button>
+
+  <p class="switchText">
+    Don’t have an account?
+    <span id="goRegister">Register</span>
+  </p>
+</div>
+
+<!-- REGISTER -->
+<div id="registerScreen" class="screen">
+  <h1 class="brand">Create Account</h1>
+
+  <input type="text" id="regName" placeholder="Full Name">
+  <input type="email" id="regEmail" placeholder="Email">
+  <input type="password" id="regPassword" placeholder="Password">
+  <input type="tel" id="regGuardian" placeholder="Guardian Phone (+91...)">
 
   <button id="registerBtn">Register</button>
-  <button id="loginBtn" class="secondary">Login</button>
+
+  <p class="switchText">
+    Already have an account?
+    <span id="goLogin">Login</span>
+  </p>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="screen">
-  <h2>Dashboard</h2>
+  <h2 id="greeting"></h2>
 
   <div id="connectionStatus" class="status">
     Stick Not Connected
