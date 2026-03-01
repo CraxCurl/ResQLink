@@ -1,83 +1,95 @@
-let device;
+// 🔥 YOUR FIREBASE CONFIG HERE
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  databaseURL: "YOUR_DB_URL"
+};
 
-function showToast(msg){
-  const t=document.createElement("div");
-  t.className="toast";
-  t.innerText=msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),3000);
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const rtdb = firebase.database();
+
+setTimeout(()=>{
+  loading.classList.remove("active");
+  auth.classList.add("active");
+},2500);
+
+// REGISTER
+async function register(){
+  const emailVal=email.value;
+  const passVal=password.value;
+  const guardianVal=guardian.value;
+
+  const userCred=await auth.createUserWithEmailAndPassword(emailVal,passVal);
+
+  await db.collection("users").doc(userCred.user.uid).set({
+    guardian:guardianVal
+  });
+
+  alert("Registered");
 }
 
-function registerUser(){
-  const user={
-    name:name.value,
-    email:email.value,
-    password:password.value,
-    guardian:guardian.value
-  };
-  localStorage.setItem("user",JSON.stringify(user));
-  showToast("Registered Successfully");
+// LOGIN
+async function login(){
+  await auth.signInWithEmailAndPassword(email.value,password.value);
+  authScreenOff();
 }
 
-function loginUser(){
-  const stored=JSON.parse(localStorage.getItem("user"));
-  if(!stored){showToast("Register first");return;}
-  if(stored.email===email.value && stored.password===password.value){
-    auth.classList.remove("active");
-    dashboard.classList.add("active");
-    guardianDisplay.innerText="+91 ******"+stored.guardian.slice(-4);
-  }else{
-    showToast("Invalid Credentials");
-  }
-}
-
-function openProfile(){
-  dashboard.classList.remove("active");
-  profile.classList.add("active");
-}
-
-function backDashboard(){
-  profile.classList.remove("active");
+function authScreenOff(){
+  auth.classList.remove("active");
   dashboard.classList.add("active");
+  initLocation();
+  listenESP32();
 }
 
-function updateGuardian(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  if(confirmPass.value!==user.password){
-    showToast("Wrong Password");
-    return;
-  }
-  user.guardian=newGuardian.value;
-  localStorage.setItem("user",JSON.stringify(user));
-  showToast("Guardian Updated");
-  backDashboard();
+// LOCATION
+function initLocation(){
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      window.currentLat=pos.coords.latitude;
+      window.currentLng=pos.coords.longitude;
+      locationStatus.innerText="Location Ready";
+    },
+    err=>{
+      locationStatus.innerText="Location Permission Denied";
+    },
+    {enableHighAccuracy:true}
+  );
 }
 
-async function connectDevice(){
-  try{
-    device=await navigator.bluetooth.requestDevice({acceptAllDevices:true});
-    await device.gatt.connect();
-    statusLight.classList.add("connected");
-    statusTitle.innerText="Stick Connected";
-    showToast("Stick Connected Successfully");
-
-    device.addEventListener("gattserverdisconnected",()=>{
-      statusLight.classList.remove("connected");
-      statusTitle.innerText="Stick Not Connected";
-    });
-
-  }catch(e){
-    showToast("Connection Failed");
-  }
+// LISTEN ESP32 TRIGGER
+function listenESP32(){
+  const uid=auth.currentUser.uid;
+  rtdb.ref("sos/"+uid).on("value",snapshot=>{
+    if(snapshot.val()==="TRIGGER"){
+      sendSOS();
+    }
+  });
 }
 
-function manualSOS(){
-  const user=JSON.parse(localStorage.getItem("user"));
-  lastAlert.innerText=new Date().toLocaleString();
-  const item=document.createElement("div");
-  item.className="activity-item";
-  item.innerText="🚨 SOS Triggered - "+new Date().toLocaleTimeString();
-  activityList.prepend(item);
+// SEND SOS
+async function manualSOS(){
+  sendSOS();
+}
 
-  window.location.href=`sms:${user.guardian}?body=🚨 SOS ALERT`;
+async function sendSOS(){
+  const uid=auth.currentUser.uid;
+  const userDoc=await db.collection("users").doc(uid).get();
+  const guardian=userDoc.data().guardian;
+
+  const mapLink=`https://www.google.com/maps?q=${currentLat},${currentLng}`;
+
+  await fetch("https://YOUR_CLOUD_FUNCTION_URL",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      guardian:guardian,
+      location:mapLink
+    })
+  });
+
+  alert("SOS Sent Successfully");
 }
