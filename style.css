@@ -2,49 +2,72 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #111827, #1f2937);
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: #0f172a;
+    overflow: hidden;
     color: white;
 }
 
+/* Animated Background */
+.bg {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, #dc2626 0%, #0f172a 60%);
+    animation: float 10s infinite alternate ease-in-out;
+}
+
+@keyframes float {
+    from { transform: translate(-10%, -10%) scale(1); }
+    to { transform: translate(-20%, -20%) scale(1.1); }
+}
+
 .app {
-    width: 100%;
+    position: relative;
+    z-index: 2;
     max-width: 420px;
+    margin: auto;
     height: 100vh;
     display: flex;
     flex-direction: column;
     padding: 20px;
 }
 
-.top-bar {
+/* Header */
+.header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
 }
 
-#statusDot {
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot {
     width: 10px;
     height: 10px;
     background: #22c55e;
     border-radius: 50%;
-    margin-right: 8px;
+    box-shadow: 0 0 10px #22c55e;
 }
 
-.settings-btn {
-    background: none;
+.gear {
+    background: rgba(255,255,255,0.1);
     border: none;
     color: white;
-    font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 10px;
 }
 
-.center {
+/* Center */
+.main {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -52,59 +75,83 @@ body {
     align-items: center;
 }
 
-.sos-btn {
-    width: 200px;
-    height: 200px;
+/* SOS Button */
+.sos {
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     border: none;
-    background: #dc2626;
+    background: linear-gradient(145deg, #ef4444, #b91c1c);
     color: white;
-    font-size: 20px;
+    font-size: 32px;
     font-weight: bold;
-    transition: 0.3s;
+    letter-spacing: 2px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
 }
 
-.sos-btn:active {
+.sos:active {
     transform: scale(0.95);
-    background: #b91c1c;
 }
 
-.hint {
-    margin-top: 15px;
+/* Pulse Effect */
+.sos::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.5);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+.sub {
+    margin-top: 20px;
     opacity: 0.6;
 }
 
-.modal {
-    display: none;
+/* Bottom Sheet */
+.sheet {
     position: fixed;
-    bottom: 0;
+    bottom: -100%;
     width: 100%;
-    background: rgba(0,0,0,0.6);
+    transition: 0.4s;
 }
 
-.modal-content {
-    background: #1f2937;
-    padding: 20px;
-    border-radius: 20px 20px 0 0;
+.sheet-content {
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 25px 25px 0 0;
+}
+
+.sheet.active {
+    bottom: 0;
 }
 
 input {
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 14px;
+    border-radius: 12px;
     border: none;
-    margin: 10px 0;
+    margin-top: 15px;
 }
 
-button {
-    padding: 10px;
-    width: 100%;
-    border-radius: 10px;
-    border: none;
-    margin-top: 5px;
-}
-
-.close {
-    background: #374151;
+.save {
+    background: #dc2626;
     color: white;
+    margin-top: 15px;
+}
+
+.cancel {
+    background: #334155;
+    color: white;
+    margin-top: 10px;
 }
