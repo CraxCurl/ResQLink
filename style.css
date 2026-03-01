@@ -1,0 +1,79 @@
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #0f0f0f;
+    overflow: hidden;
+    color: white;
+}
+
+.background-pulse {
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(255,0,0,0.2) 0%, transparent 70%);
+    animation: pulse 5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 0.4; }
+}
+
+.app-card {
+    position: relative;
+    margin: 5% auto;
+    width: 400px;
+    padding: 30px;
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    box-shadow: 0 0 40px rgba(255,0,0,0.4);
+    text-align: center;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    width: 65%;
+}
+
+button {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.sos-button {
+    margin-top: 20px;
+    width: 100%;
+    background: red;
+    color: white;
+    font-size: 18px;
+    height: 60px;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.sos-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px red;
+}
+
+.map-container {
+    margin-top: 15px;
+}
+
+iframe {
+    width: 100%;
+    height: 200px;
+    border-radius: 15px;
+}
+
+.status {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
