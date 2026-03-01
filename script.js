@@ -1,51 +1,28 @@
-let holdTimer;
+function register() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-function openSettings() {
-    document.getElementById("sheet").classList.add("active");
-}
-
-function closeSettings() {
-    document.getElementById("sheet").classList.remove("active");
-}
-
-function saveNumber() {
-    const number = document.getElementById("phoneInput").value;
-    localStorage.setItem("emergencyNumber", number);
-    document.getElementById("phoneInput").value = "";
-    closeSettings();
-}
-
-function holdStart() {
-    holdTimer = setTimeout(triggerSOS, 2000);
-}
-
-function holdEnd() {
-    clearTimeout(holdTimer);
-}
-
-function triggerSOS() {
-
-    const number = localStorage.getItem("emergencyNumber");
-    if (!number) {
-        alert("Set emergency number first.");
+    if (!email || !password) {
+        alert("Fill all fields");
         return;
     }
 
-    navigator.geolocation.getCurrentPosition(position => {
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userPassword", password);
 
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+    alert("Registered successfully!");
+}
 
-        const link = `https://maps.google.com/?q=${lat},${lon}`;
-        const msg = `🚨 SOS! I need help. Location: ${link}`;
+function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-        document.getElementById("statusText").innerText = "SOS Sent";
-        document.querySelector(".dot").style.background = "#ef4444";
+    const savedEmail = localStorage.getItem("userEmail");
+    const savedPassword = localStorage.getItem("userPassword");
 
-        if (navigator.vibrate) navigator.vibrate([400,200,400]);
-
-        window.location.href =
-            `sms:${number}?body=${encodeURIComponent(msg)}`;
-
-    });
+    if (email === savedEmail && password === savedPassword) {
+        window.location.href = "dashboard.html";
+    } else {
+        alert("Invalid credentials");
+    }
 }
