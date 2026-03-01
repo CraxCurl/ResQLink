@@ -17,100 +17,84 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* Screens */
-const loadingScreen = document.getElementById("loadingScreen");
-const loginScreen = document.getElementById("loginScreen");
-const registerScreen = document.getElementById("registerScreen");
-const dashboard = document.getElementById("dashboard");
+const screens = document.querySelectorAll(".screen");
 
-/* Loading Transition */
-setTimeout(()=>{
-  loadingScreen.classList.remove("active");
-  loginScreen.classList.add("active");
-},2500);
+function showScreen(id){
+  screens.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
-/* Switch Pages */
-document.getElementById("goRegister").onclick=()=>{
-  loginScreen.classList.remove("active");
-  registerScreen.classList.add("active");
+setTimeout(()=>showScreen("loginScreen"),2500);
+
+/* Navigation */
+goRegister.onclick=()=>showScreen("registerScreen");
+goLogin.onclick=()=>showScreen("loginScreen");
+
+/* Modal */
+window.closeModal=()=>{
+  popupModal.style.display="none";
 };
 
-document.getElementById("goLogin").onclick=()=>{
-  registerScreen.classList.remove("active");
-  loginScreen.classList.add("active");
-};
+function showModal(msg){
+  popupMessage.innerText=msg;
+  popupModal.style.display="flex";
+}
 
-/* REGISTER */
-document.getElementById("registerBtn").addEventListener("click",async()=>{
-  const name=regName.value;
-  const email=regEmail.value;
-  const password=regPassword.value;
-  const guardian=regGuardian.value;
-
+/* Register */
+registerBtn.onclick=async()=>{
   try{
-    const userCred=await createUserWithEmailAndPassword(auth,email,password);
-
+    const userCred=await createUserWithEmailAndPassword(auth,regEmail.value,regPassword.value);
     await setDoc(doc(db,"users",userCred.user.uid),{
-      name:name,
-      guardian:guardian
+      name:regName.value,
+      guardian:regGuardian.value
     });
-
-    alert("Registered Successfully");
-    registerScreen.classList.remove("active");
-    loginScreen.classList.add("active");
-
+    showModal("Registration successful.");
+    showScreen("loginScreen");
   }catch(err){
-    alert(err.message);
+    if(err.code==="auth/email-already-in-use"){
+      showModal("Email already in use.");
+    }else{
+      showModal(err.message);
+    }
   }
-});
+};
 
-/* LOGIN */
-document.getElementById("loginBtn").addEventListener("click",async()=>{
-  const email=loginEmail.value;
-  const password=loginPassword.value;
-
+/* Login */
+loginBtn.onclick=async()=>{
+  loginError.innerText="";
   try{
-    const userCred=await signInWithEmailAndPassword(auth,email,password);
-    const docSnap=await getDoc(doc(db,"users",userCred.user.uid));
-    const userData=docSnap.data();
-
-    loginScreen.classList.remove("active");
-    dashboard.classList.add("active");
-
-    greeting.innerText="Welcome, "+userData.name;
-
+    const userCred=await signInWithEmailAndPassword(auth,loginEmail.value,loginPassword.value);
+    const snap=await getDoc(doc(db,"users",userCred.user.uid));
+    greeting.innerText="Welcome, "+snap.data().name;
+    showScreen("dashboard");
     initLocation();
-
   }catch(err){
-    alert(err.message);
+    if(err.code==="auth/wrong-password"){
+      loginError.innerText="Invalid password";
+    }else{
+      loginError.innerText=err.message;
+    }
   }
-});
+};
 
-/* LOCATION */
+/* Location */
 function initLocation(){
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      window.currentLat=pos.coords.latitude;
-      window.currentLng=pos.coords.longitude;
+      window.lat=pos.coords.latitude;
+      window.lng=pos.coords.longitude;
       locationStatus.innerText="Location Ready";
     },
-    err=>{
-      locationStatus.innerText="Location Permission Denied";
-    },
+    ()=>locationStatus.innerText="Permission Denied",
     {enableHighAccuracy:true}
   );
 }
 
 /* SOS */
-document.getElementById("sosBtn").addEventListener("click",async()=>{
+sosBtn.onclick=async()=>{
   const user=auth.currentUser;
-  if(!user){alert("Not logged in");return;}
-
-  const docSnap=await getDoc(doc(db,"users",user.uid));
-  const guardian=docSnap.data().guardian;
-
-  const mapLink=`https://www.google.com/maps?q=${currentLat},${currentLng}`;
-
-  window.location.href=
-    `sms:${guardian}?body=${encodeURIComponent("🚨 EMERGENCY ALERT\n"+mapLink)}`;
-});
+  const snap=await getDoc(doc(db,"users",user.uid));
+  const guardian=snap.data().guardian;
+  const link=`https://www.google.com/maps?q=${lat},${lng}`;
+  window.location.href=`sms:${guardian}?body=${encodeURIComponent("🚨 EMERGENCY ALERT\n"+link)}`;
+};
