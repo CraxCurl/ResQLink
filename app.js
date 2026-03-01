@@ -26,30 +26,28 @@ function showScreen(id){
 
 setTimeout(()=>showScreen("loginScreen"),2500);
 
-/* Navigation */
 goRegister.onclick=()=>showScreen("registerScreen");
 goLogin.onclick=()=>showScreen("loginScreen");
 
-/* Modal */
-window.closeModal=()=>{
-  popupModal.style.display="none";
-};
+window.closeModal=()=>popupModal.style.display="none";
 
 function showModal(msg){
   popupMessage.innerText=msg;
   popupModal.style.display="flex";
 }
 
-/* Register */
 registerBtn.onclick=async()=>{
   try{
     const userCred=await createUserWithEmailAndPassword(auth,regEmail.value,regPassword.value);
+
     await setDoc(doc(db,"users",userCred.user.uid),{
       name:regName.value,
       guardian:regGuardian.value
     });
+
     showModal("Registration successful.");
     showScreen("loginScreen");
+
   }catch(err){
     if(err.code==="auth/email-already-in-use"){
       showModal("Email already in use.");
@@ -59,7 +57,6 @@ registerBtn.onclick=async()=>{
   }
 };
 
-/* Login */
 loginBtn.onclick=async()=>{
   loginError.innerText="";
   try{
@@ -77,7 +74,6 @@ loginBtn.onclick=async()=>{
   }
 };
 
-/* Location */
 function initLocation(){
   navigator.geolocation.getCurrentPosition(
     pos=>{
@@ -90,7 +86,6 @@ function initLocation(){
   );
 }
 
-/* SOS */
 sosBtn.onclick=async()=>{
   const user=auth.currentUser;
   const snap=await getDoc(doc(db,"users",user.uid));
