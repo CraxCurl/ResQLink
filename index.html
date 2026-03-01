@@ -8,53 +8,67 @@
 </head>
 <body>
 
-<div id="app">
+<div class="app">
 
   <!-- AUTH SCREEN -->
-  <div id="authScreen" class="screen active">
+  <div id="auth" class="screen active">
     <div class="auth-card">
       <h1>SignalShield</h1>
-      <p class="subtitle">Guardian Safety System</p>
+      <p>Premium IoT Safety System</p>
 
-      <input type="text" id="fullName" placeholder="Full Name">
+      <input type="text" id="name" placeholder="Full Name">
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Password">
-      <input type="tel" id="guardianPhone" placeholder="Guardian Phone Number">
+      <input type="tel" id="guardian" placeholder="Guardian Phone Number">
 
-      <button onclick="register()">Register</button>
-      <button class="secondary" onclick="login()">Login</button>
+      <button class="btn-primary" onclick="registerUser()">Register</button>
+      <button class="btn-secondary" onclick="loginUser()">Login</button>
     </div>
   </div>
 
   <!-- DASHBOARD -->
   <div id="dashboard" class="screen">
+
     <div class="top-bar">
-      <div class="logo">SignalShield</div>
+      <h2>Dashboard</h2>
       <div class="profile" onclick="openProfile()">👤</div>
     </div>
 
-    <div class="device-status">
-      <div id="connectionLight" class="light"></div>
-      <h2 id="connectionText">Stick Not Connected</h2>
+    <div class="status-card">
+      <div id="statusLight" class="status-light"></div>
+      <div id="statusTitle" class="status-title">Stick Not Connected</div>
+      <div class="status-sub">Turn on Bluetooth to connect</div>
     </div>
 
-    <button class="connect-btn" onclick="connectESP32()">Connect Stick</button>
+    <button class="btn-primary" onclick="connectDevice()">Connect Stick</button>
+
+    <div class="info-card">
+      <h4>Guardian</h4>
+      <p id="guardianDisplay"></p>
+    </div>
+
+    <div class="info-card">
+      <h4>Last Alert</h4>
+      <p id="lastAlert">No alerts sent</p>
+    </div>
+
+    <button class="sos-btn" onclick="manualSOS()">Manual SOS</button>
+
+    <div class="activity">
+      <h4>Activity</h4>
+      <div id="activityList"></div>
+    </div>
 
   </div>
 
-  <!-- PROFILE SCREEN -->
-  <div id="profileScreen" class="screen">
-    <div class="profile-card">
+  <!-- PROFILE -->
+  <div id="profile" class="screen">
+    <div class="auth-card">
       <h2>Profile</h2>
-      <p id="profileName"></p>
-      <p id="profileEmail"></p>
-
-      <h3>Change Guardian Number</h3>
-      <input type="tel" id="newGuardian">
-      <input type="password" id="confirmPassword" placeholder="Enter Password to Confirm">
-      <button onclick="updateGuardian()">Update</button>
-
-      <button class="secondary" onclick="goDashboard()">Back</button>
+      <input type="tel" id="newGuardian" placeholder="New Guardian Number">
+      <input type="password" id="confirmPass" placeholder="Enter Password">
+      <button class="btn-primary" onclick="updateGuardian()">Update</button>
+      <button class="btn-secondary" onclick="backDashboard()">Back</button>
     </div>
   </div>
 
