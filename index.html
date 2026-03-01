@@ -1,44 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ResQLink</title>
-<link rel="stylesheet" href="styles.css">
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResQLink</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<div id="loading" class="screen active">
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" class="screen active">
   <div class="logo">ResQLink</div>
-  <div id="quote">Empowering Every Step.</div>
+  <div class="quote" id="quoteText">Empowering Every Step.</div>
   <div class="loader"></div>
 </div>
 
-<div id="auth" class="screen">
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="screen">
   <h1 class="brand">ResQLink</h1>
 
   <div class="features">
-    <div>🛡 Real-Time Safety</div>
-    <div>📍 Location Tracking</div>
-    <div>🚨 Emergency SOS</div>
-    <div>👥 Guardian Connect</div>
+    <div class="feature">🛡 <strong>Real-Time Safety</strong><br><small>Instant protection when needed.</small></div>
+    <div class="feature">📍 <strong>Location Tracking</strong><br><small>Accurate live positioning.</small></div>
+    <div class="feature">🚨 <strong>Emergency SOS</strong><br><small>Immediate guardian alert.</small></div>
+    <div class="feature">👥 <strong>Guardian Connect</strong><br><small>Stay linked to trusted contacts.</small></div>
   </div>
 
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <input id="guardian" placeholder="Guardian Phone (+91...)">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <input type="tel" id="guardian" placeholder="Guardian Phone (+91...)">
 
-  <button onclick="register()">Register</button>
-  <button onclick="login()">Login</button>
+  <button id="registerBtn">Register</button>
+  <button id="loginBtn" class="secondary">Login</button>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard" class="screen">
   <h2>Dashboard</h2>
 
@@ -48,9 +45,9 @@
 
   <div id="locationStatus">Fetching location...</div>
 
-  <button onclick="manualSOS()">Manual SOS</button>
+  <button id="sosBtn" class="danger">Manual SOS</button>
 </div>
 
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
