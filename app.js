@@ -1,90 +1,83 @@
 let device;
-let characteristic;
 
-function register() {
-  const user = {
-    name: fullName.value,
-    email: email.value,
-    password: password.value,
-    guardian: guardianPhone.value
+function showToast(msg){
+  const t=document.createElement("div");
+  t.className="toast";
+  t.innerText=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+function registerUser(){
+  const user={
+    name:name.value,
+    email:email.value,
+    password:password.value,
+    guardian:guardian.value
   };
-
-  localStorage.setItem("user", JSON.stringify(user));
-  alert("Registered Successfully");
+  localStorage.setItem("user",JSON.stringify(user));
+  showToast("Registered Successfully");
 }
 
-function login() {
-  const stored = JSON.parse(localStorage.getItem("user"));
-  if (!stored) return alert("Register first");
-
-  if (stored.email === email.value && stored.password === password.value) {
-    showDashboard();
-  } else {
-    alert("Invalid Credentials");
+function loginUser(){
+  const stored=JSON.parse(localStorage.getItem("user"));
+  if(!stored){showToast("Register first");return;}
+  if(stored.email===email.value && stored.password===password.value){
+    auth.classList.remove("active");
+    dashboard.classList.add("active");
+    guardianDisplay.innerText="+91 ******"+stored.guardian.slice(-4);
+  }else{
+    showToast("Invalid Credentials");
   }
 }
 
-function showDashboard() {
-  authScreen.classList.remove("active");
-  dashboard.classList.add("active");
-}
-
-function openProfile() {
+function openProfile(){
   dashboard.classList.remove("active");
-  profileScreen.classList.add("active");
-
-  const user = JSON.parse(localStorage.getItem("user"));
-  profileName.innerText = user.name;
-  profileEmail.innerText = user.email;
+  profile.classList.add("active");
 }
 
-function goDashboard() {
-  profileScreen.classList.remove("active");
+function backDashboard(){
+  profile.classList.remove("active");
   dashboard.classList.add("active");
 }
 
-function updateGuardian() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (confirmPassword.value !== user.password) {
-    return alert("Incorrect Password");
+function updateGuardian(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  if(confirmPass.value!==user.password){
+    showToast("Wrong Password");
+    return;
   }
-
-  user.guardian = newGuardian.value;
-  localStorage.setItem("user", JSON.stringify(user));
-  alert("Guardian Updated");
+  user.guardian=newGuardian.value;
+  localStorage.setItem("user",JSON.stringify(user));
+  showToast("Guardian Updated");
+  backDashboard();
 }
 
-async function connectESP32() {
-  try {
-    device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: ['battery_service']
+async function connectDevice(){
+  try{
+    device=await navigator.bluetooth.requestDevice({acceptAllDevices:true});
+    await device.gatt.connect();
+    statusLight.classList.add("connected");
+    statusTitle.innerText="Stick Connected";
+    showToast("Stick Connected Successfully");
+
+    device.addEventListener("gattserverdisconnected",()=>{
+      statusLight.classList.remove("connected");
+      statusTitle.innerText="Stick Not Connected";
     });
 
-    const server = await device.gatt.connect();
-    document.getElementById("connectionLight").classList.add("connected");
-    document.getElementById("connectionText").innerText = "Stick Connected";
-
-    device.addEventListener('gattserverdisconnected', () => {
-      document.getElementById("connectionLight").classList.remove("connected");
-      document.getElementById("connectionText").innerText = "Stick Not Connected";
-    });
-
-    listenForSOS();
-
-  } catch (error) {
-    alert("Connection Failed");
+  }catch(e){
+    showToast("Connection Failed");
   }
 }
 
-function listenForSOS() {
-  // Replace with your real ESP32 characteristic UUID
-  console.log("Listening for SOS...");
-}
+function manualSOS(){
+  const user=JSON.parse(localStorage.getItem("user"));
+  lastAlert.innerText=new Date().toLocaleString();
+  const item=document.createElement("div");
+  item.className="activity-item";
+  item.innerText="🚨 SOS Triggered - "+new Date().toLocaleTimeString();
+  activityList.prepend(item);
 
-function sendSOS() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const message = "🚨 SOS ALERT! Please help immediately.";
-  window.location.href =
-    `sms:${user.guardian}?body=${encodeURIComponent(message)}`;
+  window.location.href=`sms:${user.guardian}?body=🚨 SOS ALERT`;
 }
