@@ -1,95 +1,88 @@
-// 🔥 YOUR FIREBASE CONFIG HERE
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc }
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* 🔥 REPLACE WITH YOUR FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  databaseURL: "YOUR_DB_URL"
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
 };
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const rtdb = firebase.database();
+/* Screens */
+const loadingScreen = document.getElementById("loadingScreen");
+const authScreen = document.getElementById("authScreen");
+const dashboard = document.getElementById("dashboard");
 
+/* Loading Transition */
 setTimeout(()=>{
-  loading.classList.remove("active");
-  auth.classList.add("active");
-},2500);
+  loadingScreen.classList.remove("active");
+  authScreen.classList.add("active");
+},2000);
 
-// REGISTER
-async function register(){
-  const emailVal=email.value;
-  const passVal=password.value;
-  const guardianVal=guardian.value;
+/* REGISTER */
+document.getElementById("registerBtn").addEventListener("click", async ()=>{
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const guardian = document.getElementById("guardian").value;
 
-  const userCred=await auth.createUserWithEmailAndPassword(emailVal,passVal);
+  try{
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db,"users",userCred.user.uid),{
+      guardian:guardian
+    });
+    alert("Registered Successfully");
+  }catch(err){
+    alert(err.message);
+  }
+});
 
-  await db.collection("users").doc(userCred.user.uid).set({
-    guardian:guardianVal
-  });
+/* LOGIN */
+document.getElementById("loginBtn").addEventListener("click", async ()=>{
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-  alert("Registered");
-}
+  try{
+    await signInWithEmailAndPassword(auth,email,password);
+    authScreen.classList.remove("active");
+    dashboard.classList.add("active");
+    initLocation();
+  }catch(err){
+    alert(err.message);
+  }
+});
 
-// LOGIN
-async function login(){
-  await auth.signInWithEmailAndPassword(email.value,password.value);
-  authScreenOff();
-}
-
-function authScreenOff(){
-  auth.classList.remove("active");
-  dashboard.classList.add("active");
-  initLocation();
-  listenESP32();
-}
-
-// LOCATION
+/* LOCATION */
 function initLocation(){
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      window.currentLat=pos.coords.latitude;
-      window.currentLng=pos.coords.longitude;
-      locationStatus.innerText="Location Ready";
+      window.currentLat = pos.coords.latitude;
+      window.currentLng = pos.coords.longitude;
+      document.getElementById("locationStatus").innerText="Location Ready";
     },
     err=>{
-      locationStatus.innerText="Location Permission Denied";
+      document.getElementById("locationStatus").innerText="Location Permission Denied";
     },
     {enableHighAccuracy:true}
   );
 }
 
-// LISTEN ESP32 TRIGGER
-function listenESP32(){
-  const uid=auth.currentUser.uid;
-  rtdb.ref("sos/"+uid).on("value",snapshot=>{
-    if(snapshot.val()==="TRIGGER"){
-      sendSOS();
-    }
-  });
-}
+/* SOS */
+document.getElementById("sosBtn").addEventListener("click", async ()=>{
+  const user = auth.currentUser;
+  if(!user){ alert("Not logged in"); return; }
 
-// SEND SOS
-async function manualSOS(){
-  sendSOS();
-}
+  const docSnap = await getDoc(doc(db,"users",user.uid));
+  const guardian = docSnap.data().guardian;
 
-async function sendSOS(){
-  const uid=auth.currentUser.uid;
-  const userDoc=await db.collection("users").doc(uid).get();
-  const guardian=userDoc.data().guardian;
+  const mapLink = `https://www.google.com/maps?q=${currentLat},${currentLng}`;
 
-  const mapLink=`https://www.google.com/maps?q=${currentLat},${currentLng}`;
-
-  await fetch("https://YOUR_CLOUD_FUNCTION_URL",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      guardian:guardian,
-      location:mapLink
-    })
-  });
-
-  alert("SOS Sent Successfully");
-}
+  window.location.href =
+    `sms:${guardian}?body=${encodeURIComponent("🚨 EMERGENCY ALERT\n"+mapLink)}`;
+});
