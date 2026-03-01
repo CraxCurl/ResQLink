@@ -1,117 +1,95 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ResQLink</title>
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
+from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc }
+from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-<!-- Loading Screen -->
-<div id="loadingScreen" class="screen active">
-  <div class="container center">
-    <h1 class="logo">ResQLink</h1>
-    <p class="quote">Empowering Every Step.</p>
-    <div class="loader"></div>
-  </div>
-</div>
+const firebaseConfig = {
+  apiKey: "AIzaSyAQU7n-P6lirLhXhyLuOm9JL-dnIf-j-2U",
+  authDomain: "resqlink-73b57.firebaseapp.com",
+  projectId: "resqlink-73b57",
+  storageBucket: "resqlink-73b57.firebasestorage.app",
+  messagingSenderId: "1089979527311",
+  appId: "1:1089979527311:web:978de63a5d76348d7440fa"
+};
 
-<!-- Login Screen -->
-<div id="loginScreen" class="screen">
-  <div class="container">
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    <h1 class="brand">ResQLink</h1>
+const screens = document.querySelectorAll(".screen");
 
-    <div class="feature-wrapper">
-      <div class="feature-grid">
-        <div class="feature-box">
-          🛡
-          <h4>Real-Time Safety</h4>
-          <p>Instant protection during emergencies.</p>
-        </div>
-        <div class="feature-box">
-          📍
-          <h4>Location Tracking</h4>
-          <p>Precise live GPS sharing.</p>
-        </div>
-        <div class="feature-box">
-          🚨
-          <h4>Emergency SOS</h4>
-          <p>One press. Immediate alert.</p>
-        </div>
-        <div class="feature-box">
-          👥
-          <h4>Guardian Connect</h4>
-          <p>Stay linked to trusted contacts.</p>
-        </div>
-      </div>
-    </div>
+function showScreen(id){
+  screens.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
 
-    <div class="form-group">
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <p id="loginError" class="error-message"></p>
-    </div>
+setTimeout(()=>showScreen("loginScreen"),2500);
 
-    <button id="loginBtn">Login</button>
+goRegister.onclick=()=>showScreen("registerScreen");
+goLogin.onclick=()=>showScreen("loginScreen");
 
-    <p class="switchText">
-      Don’t have an account?
-      <span id="goRegister">Register</span>
-    </p>
+window.closeModal=()=>popupModal.style.display="none";
 
-  </div>
-</div>
+function showModal(msg){
+  popupMessage.innerText=msg;
+  popupModal.style.display="flex";
+}
 
-<!-- Register Screen -->
-<div id="registerScreen" class="screen">
-  <div class="container">
+registerBtn.onclick=async()=>{
+  try{
+    const userCred=await createUserWithEmailAndPassword(auth,regEmail.value,regPassword.value);
 
-    <h1 class="brand">Create Account</h1>
+    await setDoc(doc(db,"users",userCred.user.uid),{
+      name:regName.value,
+      guardian:regGuardian.value
+    });
 
-    <div class="form-group">
-      <input type="text" id="regName" placeholder="Full Name">
-      <input type="email" id="regEmail" placeholder="Email">
-      <input type="password" id="regPassword" placeholder="Password">
-      <input type="tel" id="regGuardian" placeholder="Guardian Phone (+91...)">
-    </div>
+    showModal("Registration successful.");
+    showScreen("loginScreen");
 
-    <button id="registerBtn">Register</button>
+  }catch(err){
+    if(err.code==="auth/email-already-in-use"){
+      showModal("Email already in use.");
+    }else{
+      showModal(err.message);
+    }
+  }
+};
 
-    <p class="switchText">
-      Already have an account?
-      <span id="goLogin">Login</span>
-    </p>
+loginBtn.onclick=async()=>{
+  loginError.innerText="";
+  try{
+    const userCred=await signInWithEmailAndPassword(auth,loginEmail.value,loginPassword.value);
+    const snap=await getDoc(doc(db,"users",userCred.user.uid));
+    greeting.innerText="Welcome, "+snap.data().name;
+    showScreen("dashboard");
+    initLocation();
+  }catch(err){
+    if(err.code==="auth/wrong-password"){
+      loginError.innerText="Invalid password";
+    }else{
+      loginError.innerText=err.message;
+    }
+  }
+};
 
-  </div>
-</div>
+function initLocation(){
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      window.lat=pos.coords.latitude;
+      window.lng=pos.coords.longitude;
+      locationStatus.innerText="Location Ready";
+    },
+    ()=>locationStatus.innerText="Permission Denied",
+    {enableHighAccuracy:true}
+  );
+}
 
-<!-- Dashboard -->
-<div id="dashboard" class="screen">
-  <div class="container center">
-
-    <h2 id="greeting"></h2>
-
-    <div id="connectionStatus" class="status">
-      Stick Not Connected
-    </div>
-
-    <div id="locationStatus">Fetching location...</div>
-
-    <button id="sosBtn" class="danger">Manual SOS</button>
-
-  </div>
-</div>
-
-<!-- Popup Modal -->
-<div id="popupModal" class="modal">
-  <div class="modal-content">
-    <p id="popupMessage"></p>
-    <button onclick="closeModal()">OK</button>
-  </div>
-</div>
-
-<script type="module" src="app.js"></script>
-</body>
-</html>
+sosBtn.onclick=async()=>{
+  const user=auth.currentUser;
+  const snap=await getDoc(doc(db,"users",user.uid));
+  const guardian=snap.data().guardian;
+  const link=`https://www.google.com/maps?q=${lat},${lng}`;
+  window.location.href=`sms:${guardian}?body=${encodeURIComponent("🚨 EMERGENCY ALERT\n"+link)}`;
+};
