@@ -6,31 +6,48 @@
 <title>ResQLink</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-<!-- LOADING -->
-<div id="loadingScreen" class="screen active">
-  <div class="logo">ResQLink</div>
-  <div class="quote">Empowering Every Step.</div>
+<!-- Loading Screen -->
+<div id="loadingScreen" class="screen active center">
+  <h1 class="logo animate-fade">ResQLink</h1>
+  <p class="quote">Empowering Every Step.</p>
   <div class="loader"></div>
 </div>
 
-<!-- LOGIN -->
-<div id="loginScreen" class="screen">
+<!-- Login Screen -->
+<div id="loginScreen" class="screen center">
+
   <h1 class="brand">ResQLink</h1>
 
   <div class="feature-wrapper">
     <div class="feature-grid">
-      <div class="feature-box">🛡<br><small>Safety</small></div>
-      <div class="feature-box">📍<br><small>Tracking</small></div>
-      <div class="feature-box">🚨<br><small>SOS</small></div>
-      <div class="feature-box">👥<br><small>Guardian</small></div>
+      <div class="feature-box">
+        🛡
+        <h4>Real-Time Safety</h4>
+        <p>Instant protection during emergencies.</p>
+      </div>
+      <div class="feature-box">
+        📍
+        <h4>Location Tracking</h4>
+        <p>Precise live GPS sharing.</p>
+      </div>
+      <div class="feature-box">
+        🚨
+        <h4>Emergency SOS</h4>
+        <p>One press. Immediate alert.</p>
+      </div>
+      <div class="feature-box">
+        👥
+        <h4>Guardian Connect</h4>
+        <p>Stay linked to trusted contacts.</p>
+      </div>
     </div>
   </div>
 
   <input type="email" id="loginEmail" placeholder="Email">
   <input type="password" id="loginPassword" placeholder="Password">
+  <p id="loginError" class="error-message"></p>
 
   <button id="loginBtn">Login</button>
 
@@ -40,8 +57,9 @@
   </p>
 </div>
 
-<!-- REGISTER -->
-<div id="registerScreen" class="screen">
+<!-- Register Screen -->
+<div id="registerScreen" class="screen center">
+
   <h1 class="brand">Create Account</h1>
 
   <input type="text" id="regName" placeholder="Full Name">
@@ -57,8 +75,8 @@
   </p>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="screen">
+<!-- Dashboard -->
+<div id="dashboard" class="screen center">
   <h2 id="greeting"></h2>
 
   <div id="connectionStatus" class="status">
@@ -68,6 +86,14 @@
   <div id="locationStatus">Fetching location...</div>
 
   <button id="sosBtn" class="danger">Manual SOS</button>
+</div>
+
+<!-- Popup Modal -->
+<div id="popupModal" class="modal">
+  <div class="modal-content">
+    <p id="popupMessage"></p>
+    <button onclick="closeModal()">OK</button>
+  </div>
 </div>
 
 <script type="module" src="app.js"></script>
