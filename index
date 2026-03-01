@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardian SOS</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+
+</head>
+<body>
+
+<div class="background-pulse"></div>
+
+<div class="app-card">
+
+    <h1>🚨 Guardian SOS</h1>
+
+    <div class="input-group">
+        <input type="tel" id="phoneNumber" placeholder="Enter Emergency Number">
+        <button onclick="saveNumber()">Save</button>
+    </div>
+
+    <div class="map-container">
+        <iframe id="mapFrame"></iframe>
+    </div>
+
+    <button class="sos-button" onclick="triggerSOS()">
+        HOLD TO SEND SOS
+    </button>
+
+    <div class="status">
+        <span id="connectionStatus">🟢 Connected</span>
+        <span id="sosStatus">Safe</span>
+    </div>
+
+</div>
+
+<script type="module" src="firebase-config.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
