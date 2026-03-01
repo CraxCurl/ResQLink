@@ -1,49 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SignalShield</title>
-
 <link rel="stylesheet" href="styles.css">
-<link rel="manifest" href="manifest.json">
 </head>
-
 <body>
 
-<div class="app">
+<div id="app">
 
-  <!-- STATUS STRIP -->
-  <div class="status-strip">
-    <div class="status-item">
-      <span id="btDot" class="dot red"></span>
-      Bluetooth
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="screen active">
+    <div class="auth-card">
+      <h1>SignalShield</h1>
+      <p class="subtitle">Guardian Safety System</p>
+
+      <input type="text" id="fullName" placeholder="Full Name">
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <input type="tel" id="guardianPhone" placeholder="Guardian Phone Number">
+
+      <button onclick="register()">Register</button>
+      <button class="secondary" onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="screen">
+    <div class="top-bar">
+      <div class="logo">SignalShield</div>
+      <div class="profile" onclick="openProfile()">👤</div>
     </div>
 
-    <div class="status-item">
-      <span id="gpsDot" class="dot red"></span>
-      GPS
+    <div class="device-status">
+      <div id="connectionLight" class="light"></div>
+      <h2 id="connectionText">Stick Not Connected</h2>
     </div>
+
+    <button class="connect-btn" onclick="connectESP32()">Connect Stick</button>
+
   </div>
 
-  <!-- SYSTEM PANEL -->
-  <div id="systemPanel" class="system-panel armed">
-    SYSTEM ARMED
-  </div>
+  <!-- PROFILE SCREEN -->
+  <div id="profileScreen" class="screen">
+    <div class="profile-card">
+      <h2>Profile</h2>
+      <p id="profileName"></p>
+      <p id="profileEmail"></p>
 
-  <!-- HOLD BUTTON -->
-  <div class="hold-container">
-    <button id="holdBtn" class="hold-btn">
-      Hold to Send SOS
-      <div id="progressBar" class="progress-bar"></div>
-    </button>
-  </div>
+      <h3>Change Guardian Number</h3>
+      <input type="tel" id="newGuardian">
+      <input type="password" id="confirmPassword" placeholder="Enter Password to Confirm">
+      <button onclick="updateGuardian()">Update</button>
 
-  <!-- ACTIVITY PANEL -->
-  <div class="activity-panel">
-    <h4>Last Alert</h4>
-    <p id="lastAlert">No alerts sent</p>
-    <small id="deliveryStatus"></small>
+      <button class="secondary" onclick="goDashboard()">Back</button>
+    </div>
   </div>
 
 </div>
